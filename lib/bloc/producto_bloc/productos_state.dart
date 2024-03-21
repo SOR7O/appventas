@@ -7,6 +7,8 @@ abstract class ProductosState extends Equatable {
   List<Object> get props => [];
 }
 
+abstract class ProductoActionState extends ProductosState {}
+
 class InitialProductsState extends ProductosState {}
 
 class LoadingProductsState extends ProductosState {}
@@ -26,5 +28,8 @@ class LoadedErrorProductsState extends ProductosState {
   List<Object> get props => [message];
 }
 
+//
+
+class AddToCardProducto extends ProductoActionState {}
 
 // class LoadedProductsState extends ProductosState {}

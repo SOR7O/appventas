@@ -36,50 +36,77 @@ class _HomeProductosState extends State<HomeProductos> {
               return Center(child: CircularProgressIndicator());
             }
             if (state is LoadedSuccessProductsState) {
-              return ListView.builder(
-                  // physics: never(),
-                  // shrinkWrap: true,
-                  itemCount: state.prods.length,
-                  itemBuilder: (context, index) {
-                    var img = state.prods[index].imagen.split(",");
-                    // print(img);
-                    Uint8List _bytesImage = Base64Decoder().convert(img[1]);
-                    // Uint8List bytes = BASE64.decode(_base64);
-                    return Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                            10), //this is causing the error, when I remove it, I get the card like on picture 2 with the red line
-                        border: Border(
-                          left: BorderSide(
-                              color: Colors.grey,
-                              width: 3.0,
-                              style: BorderStyle.solid),
-                        ),
-                      ),
-                      // color: Colors.red,
-                      width: MediaQuery.of(context).size.width * 0.70,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Image.memory(
-                              _bytesImage,
-                              width: 200,
-                              fit: BoxFit.fitWidth,
-                            ),
-                            // state.prods[index].imagen==null?SizedBox():
-                            ListTile(
-                              title: Text(state.prods[index].nombre),
-                              subtitle: Text(state.prods[index].descripcion),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  });
+              return GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  childAspectRatio: MediaQuery.of(context).size.width /
+                      (MediaQuery.of(context).size.height * 0.95),
+                  crossAxisCount: 2, // number of items in each row
+                  mainAxisSpacing: 8.0, // spacing between rows
+                  crossAxisSpacing: 8.0, // spacing between columns
+                ),
+                padding: EdgeInsets.all(8.0), // padding around the grid
+                itemCount: state.prods.length, // total number of items
+                itemBuilder: (context, index) {
+                  var img = state.prods[index].imagen.split(",");
+                  // print(img);
+                  Uint8List _bytesImage = Base64Decoder().convert(img[1]);
+                  return bodyBuilder(_bytesImage, state, index);
+                },
+              );
             }
-
             return Center(child: Text("Error"));
           },
         ));
+  }
+
+  Container bodyBuilder(_bytesImage, state, index) {
+    return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(
+              10), //this is causing the error, when I remove it, I get the card like on picture 2 with the red line
+          border: Border(
+            left: BorderSide(
+                color: Colors.grey, width: 3.0, style: BorderStyle.solid),
+          ),
+        ), // color of grid items
+        child: body(_bytesImage, state, index));
+  }
+
+  Column body(
+      Uint8List _bytesImage, LoadedSuccessProductsState state, int index) {
+    print("Tuuppee");
+    print(state.prods[index].precio.values);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _bytesImage == null
+            ? SizedBox()
+            : Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100.0),
+                  child: Image.memory(
+                    _bytesImage,
+                    fit: BoxFit.contain,
+                    height: 130,
+                    width: 130,
+                  ),
+                ),
+              ),
+        // state.prods[index].imagen==null?SizedBox():
+        Text("Nombre: ${state.prods[index].nombre}"),
+        Text("Descripcion: ${state.prods[index].descripcion}",
+            style: TextStyle(fontSize: 10.0)),
+        Text(
+            "Precio: L.${state.prods[index].precio.values.toString().replaceAll('(', "").replaceAll(')', "")}"),
+        Center(
+          child: IconButton(
+              onPressed: () {
+                productosBloc.add(ProductosAddEvent());
+              },
+              icon: Icon(Icons.shopping_cart_checkout_rounded)),
+        )
+      ],
+    );
   }
 }

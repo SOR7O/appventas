@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
             title: 'Flutter Demo',
             debugShowCheckedModeBanner: false,
-            initialRoute: '/',
+            initialRoute: '/productos',
             onGenerateRoute: RouterGenerator.onGenerateRoute,
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),

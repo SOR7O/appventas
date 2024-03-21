@@ -13,8 +13,8 @@ class ProductosBloc extends Bloc<ProductosEvent, ProductosState> {
   // late StreamSubscription _prdSubs;
   // final ProductosBloc _prdBloc;
   ProductosBloc() : super(InitialProductsState()) {
-    print("object");
     on<InitialProductsEvent>(onLoadProds);
+    on<ProductosAddEvent>(productosAddEvent);
   }
 
   // void productosInitialFetchEvent(
@@ -31,11 +31,13 @@ class ProductosBloc extends Bloc<ProductosEvent, ProductosState> {
 
   void onLoadProds(
       InitialProductsEvent event, Emitter<ProductosState> emit) async {
-    print("Gooo to");
-    print(event);
     emit(LoadingProductsState());
     List<ProductosModel> products = await ApiService().getProductos();
-    print("Inbloc ${products.length}");
     emit(LoadedSuccessProductsState(products));
+  }
+
+  FutureOr<void> productosAddEvent(
+      ProductosAddEvent event, Emitter<ProductosState> emit) {
+    print("Gooo to");
   }
 }

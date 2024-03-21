@@ -5,10 +5,16 @@ class ProductosModel {
   final String descripcion;
   final bool disponible;
   final String imagen;
+  final Map<String, dynamic> imp;
+  final Map<String, dynamic> precio;
+  final String nombreCompany;
 
   ProductosModel(
       {required this.nombre,
       required this.descripcion,
+      required this.precio,
+      required this.imp,
+      required this.nombreCompany,
       required this.disponible,
       required this.imagen});
   Map<String, dynamic> toMap() {
@@ -17,6 +23,9 @@ class ProductosModel {
       'descripcion': descripcion,
       'disponible': disponible,
       'imagen': imagen,
+      'precio': precio,
+      'imp': imp,
+      'nombreCompany': nombreCompany,
     };
   }
 
@@ -25,6 +34,9 @@ class ProductosModel {
     return ProductosModel(
         nombre: map['nombre'] ?? '',
         descripcion: map['descripcion'] ?? '',
+        nombreCompany: map['nombreCompany'] ?? '',
+        precio: map['precio'] ?? {},
+        imp: map['imp'] ?? {},
         disponible: map['disponible'] ?? false,
         imagen: map['imagen'] ?? '');
   }

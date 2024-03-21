@@ -61,7 +61,7 @@ class _HomeUserState extends State<HomeUser> {
                   },
                 ),
                 TextButton(
-                  child: Text('Registro',
+                  child: Text('Registrarse',
                       style: TextStyle(
                           color:
                               !login ? Colors.greenAccent : Colors.blueAccent)),
