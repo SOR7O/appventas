@@ -1,94 +1,85 @@
-import 'package:flutter/material.dart';
-import 'package:ventasor/bloc/productos_bloc.dart';
+import 'dart:convert';
 
-class HomeProductos extends StatelessWidget {
-  final productosBloc = new ProductosBloc();
-  final List<Widget> rows = [];
-  final List<Widget> columns = [];
-  int numeroRow = 0;
+import 'dart:async';
+// import 'dart:convert';
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:ventasor/api/api.services.dart';
+import 'package:ventasor/bloc/producto_bloc/productos_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class HomeProductos extends StatefulWidget {
+  @override
+  State<HomeProductos> createState() => _HomeProductosState();
+}
+
+class _HomeProductosState extends State<HomeProductos> {
+  final api = ApiService();
+  late ProductosBloc productosBloc;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    // productosBloc.add(ProductosInitialFetchEvent());
+    productosBloc = ProductosBloc();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          title: const Text("Home Productos"), leading: const Text("leading")),
-      // body: test(context),
-      body: productos(context),
-    );
-  }
+        appBar: AppBar(title: Text("Home Productos")),
+        // body: test(context),
+        body: BlocBuilder<ProductosBloc, ProductosState>(
+          builder: (context, state) {
+            if (state is LoadingProductsState) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (state is LoadedSuccessProductsState) {
+              return ListView.builder(
+                  // physics: never(),
+                  // shrinkWrap: true,
+                  itemCount: state.prods.length,
+                  itemBuilder: (context, index) {
+                    var img = state.prods[index].imagen.split(",");
+                    // print(img);
+                    Uint8List _bytesImage = Base64Decoder().convert(img[1]);
+                    // Uint8List bytes = BASE64.decode(_base64);
+                    return Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                            10), //this is causing the error, when I remove it, I get the card like on picture 2 with the red line
+                        border: Border(
+                          left: BorderSide(
+                              color: Colors.grey,
+                              width: 3.0,
+                              style: BorderStyle.solid),
+                        ),
+                      ),
+                      // color: Colors.red,
+                      width: MediaQuery.of(context).size.width * 0.70,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Image.memory(
+                              _bytesImage,
+                              width: 200,
+                              fit: BoxFit.fitWidth,
+                            ),
+                            // state.prods[index].imagen==null?SizedBox():
+                            ListTile(
+                              title: Text(state.prods[index].nombre),
+                              subtitle: Text(state.prods[index].descripcion),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  });
+            }
 
-  test(context) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            card(context, 1),
-            card(context, 1),
-          ],
-        ),
-        Row(
-          children: [
-            card(context, 1),
-            card(context, 1),
-          ],
-        ),
-      ],
-    );
-  }
-
-  body(context, i) {
-    print("HowMany");
-    rows.add(card(context, i));
-    print("=>ROws=>${rows}");
-    print("=>ROws=>${rows.length}");
-
-    return card(context, i);
-  }
-
-  // card(context, i) {
-  //   var numer= (i%2)==0;
-  //   print("numer");
-  //   print(numer);
-  //   return Row(
-  //       mainAxisAlignment: MainAxisAlignment.start,
-  //       mainAxisSize: MainAxisSize.max,
-  //     children: [
-
-  //     ],
-  //   );
-  // }
-
-  productos(context) {
-    return StreamBuilder(
-      stream: productosBloc.getProductos,
-      builder: (_, AsyncSnapshot<dynamic> snapshot) {
-        final productos = snapshot.data ?? [];
-
-        return GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 90 / 80,
-              crossAxisCount: 2,
-            ),
-            itemCount: productos.length,
-            itemBuilder: (_, i) {
-              return card(context, i);
-            });
-      },
-    );
-  }
-
-  card(context, i) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      margin: EdgeInsets.all(10),
-      elevation: 5.0,
-      shadowColor: Colors.grey,
-      child: Container(
-          width: MediaQuery.of(context).size.width * 0.45,
-          height: MediaQuery.of(context).size.height * 0.1,
-          child: Text("una card despues del reload ${i}")),
-    );
+            return Center(child: Text("Error"));
+          },
+        ));
   }
 }
